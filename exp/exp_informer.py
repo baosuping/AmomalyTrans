@@ -1,4 +1,4 @@
-from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly
+from data.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Pred, Dataset_SKAB_Anomaly,Dataset_KPI_Anomaly
 from exp.exp_basic import Exp_Basic
 from models.model import Informer, InformerStack
 
@@ -72,6 +72,7 @@ class Exp_Informer(Exp_Basic):
             'custom':Dataset_Custom,
             # 修改
             'SKAB': Dataset_SKAB_Anomaly,
+            'KPI': Dataset_KPI_Anomaly,
         }
         Data = data_dict[self.args.data]
         timeenc = 0 if args.embed!='timeF' else 1
@@ -238,7 +239,8 @@ class Exp_Informer(Exp_Basic):
         test_data, test_loader = self._get_data(flag='test')
 
         path = os.path.join(args.root_path, args.data_path)
-        df_raw = pd.read_csv(path, sep=';', parse_dates=True)
+        ## 注意分号还是逗号
+        df_raw = pd.read_csv(path, sep=',', parse_dates=True)
 
         self.model.eval()
 
@@ -259,7 +261,7 @@ class Exp_Informer(Exp_Basic):
         print('test shape:', preds.shape, trues.shape)
         
         # 反归一化
-        # preds = test_data.inverse_transform(preds)
+        preds = test_data.inverse_transform(preds)
 
         # result save
         folder_path = './results/' + setting + '/'
@@ -285,7 +287,8 @@ class Exp_Informer(Exp_Basic):
         if not os.path.exists(new_dir):
             os.mkdir(new_dir)
         new_path = os.path.join(new_dir, args.data_path)
-        df_raw.to_csv(new_path, sep=';', index=False)
+        # 分号逗号改一下
+        df_raw.to_csv(new_path, sep=',', index=False)
 
         return
 

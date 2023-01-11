@@ -528,6 +528,9 @@ class Dataset_Pred(Dataset):
         self.scaler = StandardScaler()
         df_raw = pd.read_csv(os.path.join(self.root_path,
                                           self.data_path))
+        # 时间列（第一列）名称修改
+        datename = list(df_raw.columns)[0]
+        df_raw.rename(columns={datename:'date'}, inplace=True)
         '''
         df_raw.columns: ['date', ...(other features), target feature]
         '''
